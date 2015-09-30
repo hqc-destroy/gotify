@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
@@ -26,6 +27,11 @@ import (
 	"github.com/kr/pty"
 )
 
+type InitMessage struct {
+	Arguments string `json:"Arguments,omitempty"`
+	AuthToken string `json:"AuthToken,omitempty"`
+}
+
 type App struct {
 	command []string
 	options *Options
@@ -37,6 +43,8 @@ type App struct {
 }
 
 type Options struct {
+<<<<<<< HEAD
+<<<<<<< HEAD
 	Address          string                 `hcl:"address"`
 	Port             string                 `hcl:"port"`
 	PermitWrite      bool                   `hcl:"permit_write"`
@@ -55,11 +63,54 @@ type Options struct {
 	ReconnectTime    int                    `hcl:"reconnect_time"`
 	Once             bool                   `hcl:"once"`
 	Preferences      map[string]interface{} `hcl:"preferences"`
+=======
+	Address                             string                 `hcl:"address"`
+	Port                                string                 `hcl:"port"`
+	PermitWrite                         bool                   `hcl:"permit_write"`
+	EnableBasicAuth                     bool                   `hcl:"enable_basic_auth"`
+	Credential                          string                 `hcl:"credential"`
+	EnableRandomUrl                     bool                   `hcl:"enable_random_url"`
+	RandomUrlLength                     int                    `hcl:"random_url_length"`
+	IndexFile                           string                 `hcl:"index_file"`
+	EnableTLS                           bool                   `hcl:"enable_tls"`
+	TLSCrtFile                          string                 `hcl:"tls_crt_file"`
+	TLSKeyFile                          string                 `hcl:"tls_key_file"`
+	EnableClientCertificate             bool                   `hcl:"enable_client_certificate"`
+	ClientCAFile                        string                 `hcl:"client_ca_file"`
+	EnableClientCertificateVerification bool                   `hcl:"enable_client_certificate_verification"`
+	TitleFormat                         string                 `hcl:"title_format"`
+	EnableReconnect                     bool                   `hcl:"enable_reconnect"`
+	ReconnectTime                       int                    `hcl:"reconnect_time"`
+	Once                                bool                   `hcl:"once"`
+	Preferences                         map[string]interface{} `hcl:"preferences"`
+>>>>>>> 7321b43... Add client certificate fields to the configuration struct
+=======
+	Address             string                 `hcl:"address"`
+	Port                string                 `hcl:"port"`
+	PermitWrite         bool                   `hcl:"permit_write"`
+	EnableBasicAuth     bool                   `hcl:"enable_basic_auth"`
+	Credential          string                 `hcl:"credential"`
+	EnableRandomUrl     bool                   `hcl:"enable_random_url"`
+	RandomUrlLength     int                    `hcl:"random_url_length"`
+	IndexFile           string                 `hcl:"index_file"`
+	EnableTLS           bool                   `hcl:"enable_tls"`
+	TLSCrtFile          string                 `hcl:"tls_crt_file"`
+	TLSKeyFile          string                 `hcl:"tls_key_file"`
+	EnableTLSClientAuth bool                   `hcl:"enable_tls_client_auth"`
+	TLSCACrtFile        string                 `hcl:"tls_ca_crt_file"`
+	TitleFormat         string                 `hcl:"title_format"`
+	EnableReconnect     bool                   `hcl:"enable_reconnect"`
+	ReconnectTime       int                    `hcl:"reconnect_time"`
+	Once                bool                   `hcl:"once"`
+	PermitArguments     bool                   `hcl:"permit_arguments"`
+	Preferences         map[string]interface{} `hcl:"preferences"`
+>>>>>>> a4e77b2... Added handling of —permit-arguments option
 }
 
 var Version = "0.0.10"
 
 var DefaultOptions = Options{
+<<<<<<< HEAD
 	Address:          "",
 	Port:             "8080",
 	PermitWrite:      false,
@@ -78,6 +129,27 @@ var DefaultOptions = Options{
 	ReconnectTime:    10,
 	Once:             false,
 	Preferences:      make(map[string]interface{}),
+=======
+	Address:                             "",
+	Port:                                "8080",
+	PermitWrite:                         false,
+	EnableBasicAuth:                     false,
+	Credential:                          "",
+	EnableRandomUrl:                     false,
+	RandomUrlLength:                     8,
+	IndexFile:                           "",
+	EnableTLS:                           false,
+	TLSCrtFile:                          "~/.gotty.crt",
+	TLSKeyFile:                          "~/.gotty.key",
+	EnableClientCertificate:             false,
+	ClientCAFile:                        "~/.gotty.ca.crt",
+	EnableClientCertificateVerification: false,
+	TitleFormat:                         "GoTTY - {{ .Command }} ({{ .Hostname }})",
+	EnableReconnect:                     false,
+	ReconnectTime:                       10,
+	Once:                                false,
+	Preferences:                         make(map[string]interface{}),
+>>>>>>> 7321b43... Add client certificate fields to the configuration struct
 }
 
 func New(command []string, options *Options) (*App, error) {
@@ -241,6 +313,28 @@ func (app *App) Run() error {
 		keyFile := ExpandHomeDir(app.options.TLSKeyFile)
 		log.Printf("TLS crt file: " + crtFile)
 		log.Printf("TLS key file: " + keyFile)
+		if app.options.EnableClientCertificate {
+			caFile := ExpandHomeDir(app.options.ClientCAFile)
+			log.Printf("Client CA file: " + caFile)
+			caCert, err := ioutil.ReadFile(caFile)
+			if err != nil {
+				return errors.New("Cannot open CA file " + caFile)
+			}
+			caCertPool := x509.NewCertPool()
+			if !caCertPool.AppendCertsFromPEM(caCert) {
+				return errors.New("Cannot parse CA file data in " + caFile)
+			}
+			tlsVerifyPolicy := tls.RequireAnyClientCert
+			if app.options.EnableClientCertificateVerification {
+				log.Print("Enabling verification of client certificate")
+				tlsVerifyPolicy = tls.RequireAndVerifyClientCert
+			}
+			tlsConfig := &tls.Config{
+				ClientCAs:  caCertPool,
+				ClientAuth: tlsVerifyPolicy,
+			}
+			app.server.TLSConfig = tlsConfig
+		}
 		err = app.server.ListenAndServeTLS(crtFile, keyFile)
 	} else {
 		err = app.server.ListenAndServe()
@@ -268,14 +362,42 @@ func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, initMessage, err := conn.ReadMessage()
-	if err != nil || string(initMessage) != app.options.Credential {
+	_, stream, err := conn.ReadMessage()
+	if err != nil {
 		log.Print("Failed to authenticate websocket connection")
 		conn.Close()
 		return
 	}
+	var init InitMessage
 
-	cmd := exec.Command(app.command[0], app.command[1:]...)
+	err = json.Unmarshal(stream, &init)
+	if err != nil {
+		log.Printf("Failed to parse init message %v", err)
+		conn.Close()
+		return
+	}
+	if init.AuthToken != app.options.Credential {
+		log.Print("Failed to authenticate websocket connection")
+		conn.Close()
+		return
+	}
+	argv := app.command[1:]
+	if app.options.PermitArguments {
+		if init.Arguments == "" {
+			init.Arguments = "?"
+		}
+		query, err := url.Parse(init.Arguments)
+		if err != nil {
+			log.Print("Failed to parse arguments")
+			conn.Close()
+			return
+		}
+		params := query.Query()["arg"]
+		if len(params) != 0 {
+			argv = append(argv, params...)
+		}
+	}
+	cmd := exec.Command(app.command[0], argv...)
 	ptyIo, err := pty.Start(cmd)
 	if err != nil {
 		log.Print("Failed to execute command")

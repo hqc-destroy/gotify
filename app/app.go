@@ -107,7 +107,7 @@ type Options struct {
 >>>>>>> a4e77b2... Added handling of —permit-arguments option
 }
 
-var Version = "0.0.10"
+var Version = "0.0.11"
 
 var DefaultOptions = Options{
 <<<<<<< HEAD

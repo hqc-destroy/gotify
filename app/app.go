@@ -23,8 +23,8 @@ import (
 	"github.com/braintree/manners"
 	"github.com/elazarl/go-bindata-assetfs"
 	"github.com/gorilla/websocket"
-	"github.com/hashicorp/hcl"
 	"github.com/kr/pty"
+	"github.com/yudai/hcl"
 	"github.com/yudai/umutex"
 )
 
@@ -106,13 +106,19 @@ type Options struct {
 	ReconnectTime       int                    `hcl:"reconnect_time"`
 	Once                bool                   `hcl:"once"`
 	PermitArguments     bool                   `hcl:"permit_arguments"`
+<<<<<<< HEAD
 	Preferences         map[string]interface{} `hcl:"preferences"`
 >>>>>>> a4e77b2... Added handling of —permit-arguments option
+=======
+	Preferences         HtermPrefernces        `hcl:"preferences"`
+	RawPreferences      map[string]interface{} `hcl:"preferences"`
+>>>>>>> 589ec6b... Handle hterm preferences with better care
 }
 
 var Version = "0.0.11"
 
 var DefaultOptions = Options{
+<<<<<<< HEAD
 <<<<<<< HEAD
 	Address:          "",
 	Port:             "8080",
@@ -153,6 +159,26 @@ var DefaultOptions = Options{
 	Once:                                false,
 	Preferences:                         make(map[string]interface{}),
 >>>>>>> 7321b43... Add client certificate fields to the configuration struct
+=======
+	Address:             "",
+	Port:                "8080",
+	PermitWrite:         false,
+	EnableBasicAuth:     false,
+	Credential:          "",
+	EnableRandomUrl:     false,
+	RandomUrlLength:     8,
+	IndexFile:           "",
+	EnableTLS:           false,
+	TLSCrtFile:          "~/.gotty.crt",
+	TLSKeyFile:          "~/.gotty.key",
+	EnableTLSClientAuth: false,
+	TLSCACrtFile:        "~/.gotty.ca.crt",
+	TitleFormat:         "GoTTY - {{ .Command }} ({{ .Hostname }})",
+	EnableReconnect:     false,
+	ReconnectTime:       10,
+	Once:                false,
+	Preferences:         HtermPrefernces{},
+>>>>>>> 589ec6b... Handle hterm preferences with better care
 }
 
 func New(command []string, options *Options) (*App, error) {

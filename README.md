@@ -57,20 +57,27 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 --random-url, -r                                             Add a random string to the URL [$GOTTY_RANDOM_URL]
 --random-url-length "8"                                      Random URL length [$GOTTY_RANDOM_URL_LENGTH]
 --tls, -t                                                    Enable TLS/SSL [$GOTTY_TLS]
+<<<<<<< HEAD
 --tls-crt "~/.gotty.key"                                     TLS/SSL crt file path [$GOTTY_TLS_CRT]
 --tls-key "~/.gotty.crt"                                     TLS/SSL key file path [$GOTTY_TLS_KEY]
 --client, -C                                                 Enable Client Certificate [$GOTTY_CLIENT]
 --client-ca-file "~/.gotty.ca.crt"                           Client CA certificate file [$GOTTY_CLIENT_CA_FILE]
 --client-verify                                              Enable verification of client certificate [$GOTTY_CLIENT_VERIFY]
 --index                                                      Custom index file [$GOTTY_INDEX]
+=======
+--tls-crt "~/.gotty.crt"                                     TLS/SSL certificate file path [$GOTTY_TLS_CRT]
+--tls-key "~/.gotty.key"                                     TLS/SSL key file path [$GOTTY_TLS_KEY]
+--tls-ca-crt "~/.gotty.ca.crt"                               TLS/SSL CA certificate file for client certifications [$GOTTY_TLS_CA_CRT]
+--index                                                      Custom index.html file [$GOTTY_INDEX]
+>>>>>>> 6a6d0e1... Add `--close-signal` option to README
 --title-format "GoTTY - {{ .Command }} ({{ .Hostname }})"    Title format of browser window [$GOTTY_TITLE_FORMAT]
 --reconnect                                                  Enable reconnection [$GOTTY_RECONNECT]
 --reconnect-time "10"                                        Time to reconnect [$GOTTY_RECONNECT_TIME]
 --once                                                       Accept only one client and exit on disconnection [$GOTTY_ONCE]
+--permit-arguments                                           Permit clients to send command line arguments in URL (e.g. http://example.com:8080/?arg=AAA&arg=BBB) [$GOTTY_PERMIT_ARGUMENTS]
+--close-signal "1"                                           Signal sent to the command process when gotty close it (default: SIGHUP) [$GOTTY_CLOSE_SIGNAL]
 --config "~/.gotty"                                          Config file path [$GOTTY_CONFIG]
 --version, -v                                                print the version
---permit-arguments                                           Permit clients to send command line arguments in URL (e.g. http://example.com:8080/?arg=AAA&arg=BBB)
-
 ```
 
 ### Config File

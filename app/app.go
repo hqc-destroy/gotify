@@ -107,9 +107,13 @@ type Options struct {
 	Once                bool                   `hcl:"once"`
 	PermitArguments     bool                   `hcl:"permit_arguments"`
 <<<<<<< HEAD
+<<<<<<< HEAD
 	Preferences         map[string]interface{} `hcl:"preferences"`
 >>>>>>> a4e77b2... Added handling of —permit-arguments option
 =======
+=======
+	CloseSignal         int                    `hcl:"close_signal"`
+>>>>>>> 888fe87... Add configuration to modify signal sent to child process when close it
 	Preferences         HtermPrefernces        `hcl:"preferences"`
 	RawPreferences      map[string]interface{} `hcl:"preferences"`
 >>>>>>> 589ec6b... Handle hterm preferences with better care
@@ -177,6 +181,7 @@ var DefaultOptions = Options{
 	EnableReconnect:     false,
 	ReconnectTime:       10,
 	Once:                false,
+	CloseSignal:         1, // syscall.SIGHUP
 	Preferences:         HtermPrefernces{},
 >>>>>>> 589ec6b... Handle hterm preferences with better care
 }
@@ -425,7 +430,6 @@ func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
 		}
 		params := query.Query()["arg"]
 		if len(params) != 0 {
-			log.Printf("%s passed arguments are: %q", r.RemoteAddr, strings.Join(params, " "))
 			argv = append(argv, params...)
 		}
 	}
@@ -449,7 +453,7 @@ func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
 		log.Print("Failed to execute command")
 		return
 	}
-	log.Printf("Command is running for client %s with PID %d", r.RemoteAddr, cmd.Process.Pid)
+	log.Printf("Command is running for client %s with PID %d (args=%q)", r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "))
 
 	context := &clientContext{
 		app:        app,

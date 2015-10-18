@@ -119,7 +119,7 @@ type Options struct {
 >>>>>>> 589ec6b... Handle hterm preferences with better care
 }
 
-var Version = "0.0.11"
+var Version = "0.0.12"
 
 var DefaultOptions = Options{
 <<<<<<< HEAD

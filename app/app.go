@@ -18,7 +18,9 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"text/template"
+	"time"
 
 	"github.com/braintree/manners"
 	"github.com/elazarl/go-bindata-assetfs"
@@ -43,8 +45,11 @@ type App struct {
 	titleTemplate *template.Template
 
 	onceMutex *umutex.UnblockingMutex
+	timer     *time.Timer
 
-	connections int
+	// clientContext writes concurrently
+	// Use atomic operations.
+	connections *int64
 }
 
 type Options struct {
@@ -108,6 +113,7 @@ type Options struct {
 	ReconnectTime       int                    `hcl:"reconnect_time"`
 	MaxConnection       int                    `hcl:"max_connection"`
 	Once                bool                   `hcl:"once"`
+	Timeout             int                    `hcl:"timeout"`
 	PermitArguments     bool                   `hcl:"permit_arguments"`
 <<<<<<< HEAD
 <<<<<<< HEAD
@@ -119,7 +125,12 @@ type Options struct {
 >>>>>>> 888fe87... Add configuration to modify signal sent to child process when close it
 	Preferences         HtermPrefernces        `hcl:"preferences"`
 	RawPreferences      map[string]interface{} `hcl:"preferences"`
+<<<<<<< HEAD
 >>>>>>> 589ec6b... Handle hterm preferences with better care
+=======
+	Width               int                    `hcl:"width"`
+	Height              int                    `hcl:"height"`
+>>>>>>> 8fd09cd... Add an option to disable client window resizes
 }
 
 var Version = "0.0.13"
@@ -187,7 +198,12 @@ var DefaultOptions = Options{
 	Once:                false,
 	CloseSignal:         1, // syscall.SIGHUP
 	Preferences:         HtermPrefernces{},
+<<<<<<< HEAD
 >>>>>>> 589ec6b... Handle hterm preferences with better care
+=======
+	Width:               0,
+	Height:              0,
+>>>>>>> 8fd09cd... Add an option to disable client window resizes
 }
 
 func New(command []string, options *Options) (*App, error) {
@@ -195,6 +211,8 @@ func New(command []string, options *Options) (*App, error) {
 	if err != nil {
 		return nil, errors.New("Title format string syntax error")
 	}
+
+	connections := int64(0)
 
 	return &App{
 		command: command,
@@ -208,7 +226,8 @@ func New(command []string, options *Options) (*App, error) {
 
 		titleTemplate: titleTemplate,
 
-		onceMutex: umutex.New(),
+		onceMutex:   umutex.New(),
+		connections: &connections,
 	}, nil
 }
 
@@ -348,6 +367,18 @@ func (app *App) Run() error {
 	app.server = manners.NewWithServer(
 		server,
 	)
+<<<<<<< HEAD
+=======
+
+	if app.options.Timeout > 0 {
+		app.timer = time.NewTimer(time.Duration(app.options.Timeout) * time.Second)
+		go func() {
+			<-app.timer.C
+			app.Exit()
+		}()
+	}
+
+>>>>>>> 8c9433f... Add timeout option
 	if app.options.EnableTLS {
 		crtFile := ExpandHomeDir(app.options.TLSCrtFile)
 		keyFile := ExpandHomeDir(app.options.TLSKeyFile)
@@ -388,9 +419,54 @@ func (app *App) Run() error {
 	return nil
 }
 
+<<<<<<< HEAD
+=======
+func (app *App) makeServer(addr string, handler *http.Handler) (*http.Server, error) {
+	server := &http.Server{
+		Addr:    addr,
+		Handler: *handler,
+	}
+
+	if app.options.EnableTLSClientAuth {
+		caFile := ExpandHomeDir(app.options.TLSCACrtFile)
+		log.Printf("CA file: " + caFile)
+		caCert, err := ioutil.ReadFile(caFile)
+		if err != nil {
+			return nil, errors.New("Could not open CA crt file " + caFile)
+		}
+		caCertPool := x509.NewCertPool()
+		if !caCertPool.AppendCertsFromPEM(caCert) {
+			return nil, errors.New("Could not parse CA crt file data in " + caFile)
+		}
+		tlsConfig := &tls.Config{
+			ClientCAs:  caCertPool,
+			ClientAuth: tls.RequireAndVerifyClientCert,
+		}
+		server.TLSConfig = tlsConfig
+	}
+
+	return server, nil
+}
+
+func (app *App) stopTimer() {
+	if app.options.Timeout > 0 {
+		app.timer.Stop()
+	}
+}
+
+func (app *App) restartTimer() {
+	if app.options.Timeout > 0 {
+		app.timer.Reset(time.Duration(app.options.Timeout) * time.Second)
+	}
+}
+
+>>>>>>> 8c9433f... Add timeout option
 func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
-	if app.options.MaxConnection != 0 {
-		if app.connections >= app.options.MaxConnection {
+	app.stopTimer()
+
+	connections := atomic.AddInt64(app.connections, 1)
+	if int64(app.options.MaxConnection) != 0 {
+		if connections >= int64(app.options.MaxConnection) {
 			log.Printf("Reached max connection: %d", app.options.MaxConnection)
 			return
 		}
@@ -464,13 +540,12 @@ func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.connections++
 	if app.options.MaxConnection != 0 {
 		log.Printf("Command is running for client %s with PID %d (args=%q), connections: %d/%d",
-			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), app.connections, app.options.MaxConnection)
+			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), connections, app.options.MaxConnection)
 	} else {
 		log.Printf("Command is running for client %s with PID %d (args=%q), connections: %d",
-			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), app.connections)
+			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), connections)
 	}
 
 	context := &clientContext{
@@ -490,6 +565,7 @@ func (app *App) handleCustomIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) handleAuthToken(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/javascript")
 	w.Write([]byte("var gotty_auth_token = '" + app.options.Credential + "';"))
 }
 

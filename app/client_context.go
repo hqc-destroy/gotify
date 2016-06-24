@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"syscall"
 	"unsafe"
 
@@ -69,6 +70,21 @@ func (context *clientContext) goHandleClient() {
 
 	go func() {
 		defer context.app.server.FinishRoutine()
+		defer func() {
+			connections := atomic.AddInt64(context.app.connections, -1)
+
+			if context.app.options.MaxConnection != 0 {
+				log.Printf("Connection closed: %s, connections: %d/%d",
+					context.request.RemoteAddr, connections, context.app.options.MaxConnection)
+			} else {
+				log.Printf("Connection closed: %s, connections: %d",
+					context.request.RemoteAddr, connections)
+			}
+
+			if connections == 0 {
+				context.app.restartTimer()
+			}
+		}()
 
 		<-exit
 		context.pty.Close()
@@ -79,14 +95,6 @@ func (context *clientContext) goHandleClient() {
 
 		context.command.Wait()
 		context.connection.Close()
-		context.app.connections--
-		if context.app.options.MaxConnection != 0 {
-			log.Printf("Connection closed: %s, connections: %d/%d",
-				context.request.RemoteAddr, context.app.connections, context.app.options.MaxConnection)
-		} else {
-			log.Printf("Connection closed: %s, connections: %d",
-				context.request.RemoteAddr, context.app.connections)
-		}
 	}()
 }
 
@@ -197,14 +205,24 @@ func (context *clientContext) processReceive() {
 				return
 			}
 
+			rows := uint16(context.app.options.Height)
+			if rows == 0 {
+				rows = uint16(args.Rows)
+			}
+
+			columns := uint16(context.app.options.Width)
+			if columns == 0 {
+				columns = uint16(args.Columns)
+			}
+
 			window := struct {
 				row uint16
 				col uint16
 				x   uint16
 				y   uint16
 			}{
-				uint16(args.Rows),
-				uint16(args.Columns),
+				rows,
+				columns,
 				0,
 				0,
 			}

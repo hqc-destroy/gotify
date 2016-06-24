@@ -35,10 +35,13 @@ func main() {
 		flag{"title-format", "", "Title format of browser window"},
 		flag{"reconnect", "", "Enable reconnection"},
 		flag{"reconnect-time", "", "Time to reconnect"},
+		flag{"timeout", "", "Timeout seconds for waiting a client (0 to disable)"},
 		flag{"max-connection", "", "Maximum connection to gotty, 0(default) means no limit"},
 		flag{"once", "", "Accept only one client and exit on disconnection"},
 		flag{"permit-arguments", "", "Permit clients to send command line arguments in URL (e.g. http://example.com:8080/?arg=AAA&arg=BBB)"},
 		flag{"close-signal", "", "Signal sent to the command process when gotty close it (default: SIGHUP)"},
+		flag{"width", "", "Static width of the screen, 0(default) means dynamically resize"},
+		flag{"height", "", "Static height of the screen, 0(default) means dynamically resize"},
 	}
 
 	mappingHint := map[string]string{

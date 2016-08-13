@@ -43,6 +43,8 @@ type App struct {
 	titleTemplate *template.Template
 
 	onceMutex *umutex.UnblockingMutex
+
+	connections int
 }
 
 type Options struct {
@@ -104,6 +106,7 @@ type Options struct {
 	TitleFormat         string                 `hcl:"title_format"`
 	EnableReconnect     bool                   `hcl:"enable_reconnect"`
 	ReconnectTime       int                    `hcl:"reconnect_time"`
+	MaxConnection       int                    `hcl:"max_connection"`
 	Once                bool                   `hcl:"once"`
 	PermitArguments     bool                   `hcl:"permit_arguments"`
 <<<<<<< HEAD
@@ -180,6 +183,7 @@ var DefaultOptions = Options{
 	TitleFormat:         "GoTTY - {{ .Command }} ({{ .Hostname }})",
 	EnableReconnect:     false,
 	ReconnectTime:       10,
+	MaxConnection:       0,
 	Once:                false,
 	CloseSignal:         1, // syscall.SIGHUP
 	Preferences:         HtermPrefernces{},
@@ -385,6 +389,12 @@ func (app *App) Run() error {
 }
 
 func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
+	if app.options.MaxConnection != 0 {
+		if app.connections >= app.options.MaxConnection {
+			log.Printf("Reached max connection: %d", app.options.MaxConnection)
+			return
+		}
+	}
 	log.Printf("New client connected: %s", r.RemoteAddr)
 
 	if r.Method != "GET" {
@@ -453,7 +463,15 @@ func (app *App) handleWS(w http.ResponseWriter, r *http.Request) {
 		log.Print("Failed to execute command")
 		return
 	}
-	log.Printf("Command is running for client %s with PID %d (args=%q)", r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "))
+
+	app.connections++
+	if app.options.MaxConnection != 0 {
+		log.Printf("Command is running for client %s with PID %d (args=%q), connections: %d/%d",
+			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), app.connections, app.options.MaxConnection)
+	} else {
+		log.Printf("Command is running for client %s with PID %d (args=%q), connections: %d",
+			r.RemoteAddr, cmd.Process.Pid, strings.Join(argv, " "), app.connections)
+	}
 
 	context := &clientContext{
 		app:        app,

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/signal"
@@ -8,19 +9,21 @@ import (
 
 	"github.com/codegangsta/cli"
 
-	"github.com/yudai/gotty/app"
-	"github.com/yudai/gotty/backends/ptycommand"
+	"github.com/yudai/gotty/backend/localcommand"
+	"github.com/yudai/gotty/pkg/homedir"
+	"github.com/yudai/gotty/server"
 	"github.com/yudai/gotty/utils"
 )
 
 func main() {
-	cmd := cli.NewApp()
-	cmd.Name = "gotty"
-	cmd.Version = app.Version
-	cmd.Usage = "Share your terminal as a web application"
-	cmd.HideHelp = true
+	app := cli.NewApp()
+	app.Name = "gotty"
+	app.Version = Version
+	app.Usage = "Share your terminal as a web application"
+	app.HideHelp = true
 	cli.AppHelpTemplate = helpTemplate
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
 	flags := []flag{
@@ -72,10 +75,13 @@ func main() {
 >>>>>>> d71e2fc... generate falgs based on struct options instead of defining them externally
 =======
 	appOptions := &app.Options{}
+=======
+	appOptions := &server.Options{}
+>>>>>>> a6133f3... Refactor
 	if err := utils.ApplyDefaultValues(appOptions); err != nil {
 		exit(err, 1)
 	}
-	backendOptions := &ptycommand.Options{}
+	backendOptions := &localcommand.Options{}
 	if err := utils.ApplyDefaultValues(backendOptions); err != nil {
 		exit(err, 1)
 	}
@@ -86,7 +92,7 @@ func main() {
 		exit(err, 3)
 	}
 
-	cmd.Flags = append(
+	app.Flags = append(
 		cliFlags,
 		cli.StringFlag{
 			Name:   "config",
@@ -96,7 +102,7 @@ func main() {
 		},
 	)
 
-	cmd.Action = func(c *cli.Context) {
+	app.Action = func(c *cli.Context) {
 		if len(c.Args()) == 0 {
 			msg := "Error: No command given."
 			cli.ShowAppHelp(c)
@@ -104,7 +110,7 @@ func main() {
 		}
 
 		configFile := c.String("config")
-		_, err := os.Stat(utils.ExpandHomeDir(configFile))
+		_, err := os.Stat(homedir.Expand(configFile))
 		if configFile != "~/.gotty" || !os.IsNotExist(err) {
 			if err := utils.ApplyConfigFile(configFile, appOptions, backendOptions); err != nil {
 				exit(err, 2)
@@ -125,28 +131,46 @@ func main() {
 		appOptions.EnableTLSClientAuth = c.IsSet("tls-ca-crt")
 >>>>>>> 496ef86... refactor: decouple gotty app with terminal backends
 
-		if err := app.CheckConfig(appOptions); err != nil {
+		err = appOptions.Validate()
+		if err != nil {
 			exit(err, 6)
 >>>>>>> d71e2fc... generate falgs based on struct options instead of defining them externally
 		}
 
-		manager, err := ptycommand.NewCommandClientContextManager(c.Args(), backendOptions)
-		if err != nil {
-			exit(err, 3)
-		}
-		app, err := app.New(manager, appOptions)
+		args := c.Args()
+		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
 		if err != nil {
 			exit(err, 3)
 		}
 
-		registerSignals(app)
-
-		err = app.Run()
-		if err != nil {
-			exit(err, 4)
+		hostname, _ := os.Hostname()
+		appOptions.TitleVariables = map[string]interface{}{
+			"command":  args[0],
+			"argv":     args[1:],
+			"hostname": hostname,
 		}
+
+		srv, err := server.New(factory, appOptions)
+		if err != nil {
+			exit(err, 3)
+		}
+
+		ctx, cancel := context.WithCancel(context.Background())
+		gCtx, gCancel := context.WithCancel(context.Background())
+
+		errs := make(chan error, 1)
+		go func() {
+			errs <- srv.Run(ctx, server.WithGracefullContext(gCtx))
+		}()
+		err = waitSignals(errs, cancel, gCancel)
+
+		if err != nil && err != context.Canceled {
+			fmt.Printf("Error: %s\n", err)
+			exit(err, 8)
+		}
+
 	}
-	cmd.Run(os.Args)
+	app.Run(os.Args)
 }
 
 func exit(err error, code int) {
@@ -156,7 +180,7 @@ func exit(err error, code int) {
 	os.Exit(code)
 }
 
-func registerSignals(app *app.App) {
+func waitSignals(errs chan error, cancel context.CancelFunc, gracefullCancel context.CancelFunc) error {
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(
 		sigChan,
@@ -164,17 +188,25 @@ func registerSignals(app *app.App) {
 		syscall.SIGTERM,
 	)
 
-	go func() {
-		for {
-			s := <-sigChan
-			switch s {
-			case syscall.SIGINT, syscall.SIGTERM:
-				if app.Exit() {
-					fmt.Println("Send ^C to force exit.")
-				} else {
-					os.Exit(5)
-				}
+	select {
+	case err := <-errs:
+		return err
+
+	case s := <-sigChan:
+		switch s {
+		case syscall.SIGINT:
+			gracefullCancel()
+			fmt.Println("C-C to force close")
+			select {
+			case err := <-errs:
+				return err
+			case <-sigChan:
+				cancel()
+				return <-errs
 			}
+		default:
+			cancel()
+			return <-errs
 		}
-	}()
+	}
 }

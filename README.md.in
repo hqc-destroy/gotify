@@ -45,6 +45,7 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 ## Options
 
 ```
+<<<<<<< HEAD
 --address value, -a value     IP address to listen (default: "0.0.0.0") [$GOTTY_ADDRESS]
 --port value, -p value        Port number to listen (default: "8080") [$GOTTY_PORT]
 --permit-write, -w            Permit clients to write to the TTY (BE CAREFUL) [$GOTTY_PERMIT_WRITE]
@@ -71,6 +72,9 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 --close-timeout value         Time in seconds to force kill process after client is disconnected (default: -1) (default: -1) [$GOTTY_CLOSE_TIMEOUT]
 --config value                Config file path (default: "~/.gotty") [$GOTTY_CONFIG]
 --version, -v                 print the version
+=======
+@OPTIONS@
+>>>>>>> f01cf51... Automate options documentation
 ```
 
 ### Config File
@@ -201,3 +205,5 @@ The MIT License
  * Søren L. Hansen
 
 ## Contributors
+
+@CONTRIBUTORS@

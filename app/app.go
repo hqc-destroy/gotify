@@ -133,7 +133,7 @@ type Options struct {
 >>>>>>> 8fd09cd... Add an option to disable client window resizes
 }
 
-var Version = "0.0.13"
+var Version = "1.0.0"
 
 var DefaultOptions = Options{
 <<<<<<< HEAD

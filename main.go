@@ -9,15 +9,20 @@ import (
 	"github.com/codegangsta/cli"
 
 	"github.com/yudai/gotty/app"
+	"github.com/yudai/gotty/backends/ptycommand"
+	"github.com/yudai/gotty/utils"
 )
 
 func main() {
 	cmd := cli.NewApp()
-	cmd.Version = app.Version
 	cmd.Name = "gotty"
+	cmd.Version = app.Version
 	cmd.Usage = "Share your terminal as a web application"
 	cmd.HideHelp = true
+	cli.AppHelpTemplate = helpTemplate
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 	flags := []flag{
 		flag{"address", "a", "IP address to listen"},
 		flag{"port", "p", "Port number to listen"},
@@ -57,6 +62,26 @@ func main() {
 	}
 
 	cliFlags, err := generateFlags(flags, mappingHint)
+=======
+	options := &app.Options{}
+	if err := utils.ApplyDefaultValues(options); err != nil {
+		exit(err, 1)
+	}
+
+	cliFlags, flagMappings, err := utils.GenerateFlags(options)
+>>>>>>> d71e2fc... generate falgs based on struct options instead of defining them externally
+=======
+	appOptions := &app.Options{}
+	if err := utils.ApplyDefaultValues(appOptions); err != nil {
+		exit(err, 1)
+	}
+	backendOptions := &ptycommand.Options{}
+	if err := utils.ApplyDefaultValues(backendOptions); err != nil {
+		exit(err, 1)
+	}
+
+	cliFlags, flagMappings, err := utils.GenerateFlags(appOptions, backendOptions)
+>>>>>>> 496ef86... refactor: decouple gotty app with terminal backends
 	if err != nil {
 		exit(err, 3)
 	}
@@ -73,28 +98,43 @@ func main() {
 
 	cmd.Action = func(c *cli.Context) {
 		if len(c.Args()) == 0 {
-			fmt.Println("Error: No command given.\n")
+			msg := "Error: No command given."
 			cli.ShowAppHelp(c)
-			exit(err, 1)
+			exit(fmt.Errorf(msg), 1)
 		}
 
-		options := app.DefaultOptions
-
 		configFile := c.String("config")
-		_, err := os.Stat(app.ExpandHomeDir(configFile))
+		_, err := os.Stat(utils.ExpandHomeDir(configFile))
 		if configFile != "~/.gotty" || !os.IsNotExist(err) {
-			if err := app.ApplyConfigFile(&options, configFile); err != nil {
+			if err := utils.ApplyConfigFile(configFile, appOptions, backendOptions); err != nil {
 				exit(err, 2)
 			}
 		}
 
-		applyFlags(&options, flags, mappingHint, c)
+		utils.ApplyFlags(cliFlags, flagMappings, c, appOptions, backendOptions)
 
+<<<<<<< HEAD
+<<<<<<< HEAD
 		if c.IsSet("credential") {
 			options.EnableBasicAuth = true
+=======
+		options.EnableBasicAuth = c.IsSet("credential")
+		options.EnableTLSClientAuth = c.IsSet("tls-ca-crt")
+=======
+		appOptions.EnableBasicAuth = c.IsSet("credential")
+		appOptions.EnableTLSClientAuth = c.IsSet("tls-ca-crt")
+>>>>>>> 496ef86... refactor: decouple gotty app with terminal backends
+
+		if err := app.CheckConfig(appOptions); err != nil {
+			exit(err, 6)
+>>>>>>> d71e2fc... generate falgs based on struct options instead of defining them externally
 		}
 
-		app, err := app.New(c.Args(), &options)
+		manager, err := ptycommand.NewCommandClientContextManager(c.Args(), backendOptions)
+		if err != nil {
+			exit(err, 3)
+		}
+		app, err := app.New(manager, appOptions)
 		if err != nil {
 			exit(err, 3)
 		}
@@ -106,9 +146,6 @@ func main() {
 			exit(err, 4)
 		}
 	}
-
-	cli.AppHelpTemplate = helpTemplate
-
 	cmd.Run(os.Args)
 }
 

@@ -201,6 +201,7 @@ func waitSignals(errs chan error, cancel context.CancelFunc, gracefullCancel con
 			case err := <-errs:
 				return err
 			case <-sigChan:
+				fmt.Println("Force closing...")
 				cancel()
 				return <-errs
 			}

@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 
 	"github.com/codegangsta/cli"
@@ -157,6 +159,8 @@ func main() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 		gCtx, gCancel := context.WithCancel(context.Background())
+
+		log.Printf("GoTTY is starting with command: %s", strings.Join(args, " "))
 
 		errs := make(chan error, 1)
 		go func() {

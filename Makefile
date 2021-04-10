@@ -4,11 +4,16 @@ VERSION = 2.0.0-alpha.3
 BUILD_OPTIONS = -ldflags "-X main.Version=$(VERSION) -X main.CommitID=$(GIT_COMMIT)"
 
 gotty: main.go server/*.go webtty/*.go backend/*.go Makefile
+<<<<<<< HEAD
 	go build ${BUILD_OPTIONS}
 
 docker: 
 	docker build . -t gotty-bash:$(VERSION)
 
+=======
+	mkdir -p ${OUTPUT_DIR}
+	go build -o ${OUTPUT_DIR} ${BUILD_OPTIONS} ./...
+>>>>>>> ac0a15d... Update toolchain
 
 .PHONY: asset
 asset: bindata/static/js/gotty-bundle.js bindata/static/index.html bindata/static/favicon.png bindata/static/css/index.css bindata/static/css/xterm.css bindata/static/css/xterm_customize.css

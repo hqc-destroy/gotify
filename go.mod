@@ -1,4 +1,4 @@
-module github.com/yudai/gotty
+module github.com/sorenisanerd/gotty
 
 <<<<<<< HEAD
 go 1.13

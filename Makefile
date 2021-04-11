@@ -16,7 +16,7 @@ docker:
 >>>>>>> ac0a15d... Update toolchain
 
 .PHONY: asset
-asset: bindata/static/js/gotty-bundle.js bindata/static/index.html bindata/static/favicon.png bindata/static/css/index.css bindata/static/css/xterm.css bindata/static/css/xterm_customize.css
+asset: bindata/static/js/gotty-bundle.js bindata/static/index.html bindata/static/favicon.png bindata/static/css/index.css bindata/static/css/xterm.css bindata/static/css/xterm_customize.css bindata/static/manifest.json bindata/static/icon_192.png
 	go-bindata -prefix bindata -pkg server -ignore=\\.gitkeep -o server/asset.go bindata/...
 	gofmt -w server/asset.go
 
@@ -32,8 +32,14 @@ bindata/static: bindata
 bindata/static/index.html: bindata/static resources/index.html
 	cp resources/index.html bindata/static/index.html
 
+bindata/static/manifest.json: bindata/static resources/manifest.json
+	cp resources/manifest.json bindata/static/manifest.json
+
 bindata/static/favicon.png: bindata/static resources/favicon.png
 	cp resources/favicon.png bindata/static/favicon.png
+
+bindata/static/icon_192.png: bindata/static resources/icon_192.png
+	cp resources/icon_192.png bindata/static/icon_192.png
 
 bindata/static/js: bindata/static
 	mkdir -p bindata/static/js
@@ -86,6 +92,6 @@ shasums:
 	cd ${OUTPUT_DIR}/dist; sha256sum * > ./SHA256SUMS
 
 release:
-	ghr -c ${GIT_COMMIT} --delete --prerelease -u yudai -r gotty pre-release ${OUTPUT_DIR}/dist
+	ghr -c ${GIT_COMMIT} --delete --prerelease -u sorenisanerd -r gotty pre-release ${OUTPUT_DIR}/dist
 clean:
 	rm -fr gotty

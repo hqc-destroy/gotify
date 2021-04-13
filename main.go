@@ -9,7 +9,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/urfave/cli"
+	cli "github.com/urfave/cli/v2"
 
 	"github.com/sorenisanerd/gotty/backend/localcommand"
 	"github.com/sorenisanerd/gotty/pkg/homedir"
@@ -22,6 +22,7 @@ func main() {
 	app.Name = "gotty"
 	app.Version = Version + "+" + CommitID
 	app.Usage = "Share your terminal as a web application"
+<<<<<<< HEAD
 	app.HideHelp = true
 	cli.AppHelpTemplate = helpTemplate
 
@@ -80,6 +81,11 @@ func main() {
 =======
 	appOptions := &server.Options{}
 >>>>>>> a6133f3... Refactor
+=======
+	app.HideHelpCommand = true
+	appOptions := &server.Options{}
+
+>>>>>>> c3c670b... Switch to urfave/cli/v2... again.
 	if err := utils.ApplyDefaultValues(appOptions); err != nil {
 		exit(err, 1)
 	}
@@ -96,16 +102,16 @@ func main() {
 
 	app.Flags = append(
 		cliFlags,
-		cli.StringFlag{
-			Name:   "config",
-			Value:  "~/.gotty",
-			Usage:  "Config file path",
-			EnvVar: "GOTTY_CONFIG",
+		&cli.StringFlag{
+			Name:    "config",
+			Value:   "~/.gotty",
+			Usage:   "Config file path",
+			EnvVars: []string{"GOTTY_CONFIG"},
 		},
 	)
 
-	app.Action = func(c *cli.Context) {
-		if len(c.Args()) == 0 {
+	app.Action = func(c *cli.Context) error {
+		if c.NArg() == 0 {
 			msg := "Error: No command given."
 			cli.ShowAppHelp(c)
 			exit(fmt.Errorf(msg), 1)
@@ -140,15 +146,15 @@ func main() {
 		}
 
 		args := c.Args()
-		factory, err := localcommand.NewFactory(args[0], args[1:], backendOptions)
+		factory, err := localcommand.NewFactory(args.First(), args.Tail(), backendOptions)
 		if err != nil {
 			exit(err, 3)
 		}
 
 		hostname, _ := os.Hostname()
 		appOptions.TitleVariables = map[string]interface{}{
-			"command":  args[0],
-			"argv":     args[1:],
+			"command":  args.First(),
+			"argv":     args.Tail(),
 			"hostname": hostname,
 		}
 
@@ -160,7 +166,7 @@ func main() {
 		ctx, cancel := context.WithCancel(context.Background())
 		gCtx, gCancel := context.WithCancel(context.Background())
 
-		log.Printf("GoTTY is starting with command: %s", strings.Join(args, " "))
+		log.Printf("GoTTY is starting with command: %s", strings.Join(args.Slice(), " "))
 
 		errs := make(chan error, 1)
 		go func() {
@@ -173,6 +179,7 @@ func main() {
 			exit(err, 8)
 		}
 
+		return nil
 	}
 	app.Run(os.Args)
 }

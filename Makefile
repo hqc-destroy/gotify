@@ -1,6 +1,6 @@
 OUTPUT_DIR = ./builds
 GIT_COMMIT = `git rev-parse HEAD | cut -c1-7`
-VERSION = 2.1.0alpha2
+VERSION = 1.1.0
 BUILD_OPTIONS = -ldflags "-X main.Version=$(VERSION) -X main.CommitID=$(GIT_COMMIT)"
 
 <<<<<<< HEAD
@@ -75,9 +75,9 @@ js/node_modules/webpack:
 	npm install
 
 README.md: README.md.in
-	(cat $< ; git log --pretty=format:' * %aN <%aE>' | \
-		grep -v 'sorenisanerd' | \
-		grep -v 'yudai@arielsworks' | \
+	(cat $< ; git log --pretty=format:' * %aN' | \
+		grep -v 'S.*ren L. Hansen' | \
+		grep -v 'Iwasaki Yudai' | \
 		sort -u ) > $@
 
 tools:
@@ -90,7 +90,7 @@ test:
 	if [ `go fmt $(go list ./... | grep -v /vendor/) | wc -l` -gt 0 ]; then echo "go fmt error"; exit 1; fi
 
 cross_compile:
-	GOARM=5 gox -os="darwin linux freebsd netbsd openbsd solaris" -arch="386 amd64 arm" -osarch="!darwin/arm" -output "${OUTPUT_DIR}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
+	GOARM=5 gox -os="darwin linux freebsd netbsd openbsd solaris" -arch="386 amd64 arm" -osarch="!darwin/386" -osarch="!darwin/arm" -output "${OUTPUT_DIR}/pkg/{{.OS}}_{{.Arch}}/{{.Dir}}"
 
 targz:
 	mkdir -p ${OUTPUT_DIR}/dist
@@ -102,7 +102,7 @@ shasums:
 release-artifacts: asset gotty cross_compile targz shasums
 
 release:
-	ghr -draft -prerelease ${VERSION} ${OUTPUT_DIR}/dist # -c ${GIT_COMMIT} --delete --prerelease -u sorenisanerd -r gotty ${VERSION}
+	ghr -draft ${VERSION} ${OUTPUT_DIR}/dist # -c ${GIT_COMMIT} --delete --prerelease -u sorenisanerd -r gotty ${VERSION}
 
 clean:
-	rm -fr gotty builds bindata server/asset.go
+	rm -fr gotty builds bindata server/asset.go js/dist

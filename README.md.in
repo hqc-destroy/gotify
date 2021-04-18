@@ -12,11 +12,7 @@ GoTTY is a simple command line tool that turns your CLI tools into web applicati
 
 # Installation
 
-<<<<<<< HEAD
 Download the latest stable binary file from the [Releases](https://github.com/sorenisanerd/gotty/releases) page. Note that the release marked `Pre-release` is built for testing purpose, which can include unstable or breaking changes. Download a release marked [Latest release](https://github.com/sorenisanerd/gotty/releases/latest) for a stable build.
-=======
-Download the latest stable binary file from the [Releases](https://github.com/yudai/gotty/releases) page. Note that the release marked `Pre-release` is built for testing purpose, which can include unstable or breaking changes. Download a release marked [Latest release](https://github.com/yudai/gotty/releases/latest) for a stable build.
->>>>>>> 4876619... Fix typo in readme
 
 (Files named with `darwin_amd64` are for Mac OS X users)
 
@@ -49,38 +45,6 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 ## Options
 
 ```
-<<<<<<< HEAD
---address, -a                                                IP address to listen [$GOTTY_ADDRESS]
---port, -p "8080"                                            Port number to listen [$GOTTY_PORT]
---permit-write, -w                                           Permit clients to write to the TTY (BE CAREFUL) [$GOTTY_PERMIT_WRITE]
---credential, -c                                             Credential for Basic Authentication (ex: user:pass, default disabled) [$GOTTY_CREDENTIAL]
---random-url, -r                                             Add a random string to the URL [$GOTTY_RANDOM_URL]
---random-url-length "8"                                      Random URL length [$GOTTY_RANDOM_URL_LENGTH]
---tls, -t                                                    Enable TLS/SSL [$GOTTY_TLS]
-<<<<<<< HEAD
---tls-crt "~/.gotty.key"                                     TLS/SSL crt file path [$GOTTY_TLS_CRT]
---tls-key "~/.gotty.crt"                                     TLS/SSL key file path [$GOTTY_TLS_KEY]
---client, -C                                                 Enable Client Certificate [$GOTTY_CLIENT]
---client-ca-file "~/.gotty.ca.crt"                           Client CA certificate file [$GOTTY_CLIENT_CA_FILE]
---client-verify                                              Enable verification of client certificate [$GOTTY_CLIENT_VERIFY]
---index                                                      Custom index file [$GOTTY_INDEX]
-=======
---tls-crt "~/.gotty.crt"                                     TLS/SSL certificate file path [$GOTTY_TLS_CRT]
---tls-key "~/.gotty.key"                                     TLS/SSL key file path [$GOTTY_TLS_KEY]
---tls-ca-crt "~/.gotty.ca.crt"                               TLS/SSL CA certificate file for client certifications [$GOTTY_TLS_CA_CRT]
---index                                                      Custom index.html file [$GOTTY_INDEX]
->>>>>>> 6a6d0e1... Add `--close-signal` option to README
---title-format "GoTTY - {{ .Command }} ({{ .Hostname }})"    Title format of browser window [$GOTTY_TITLE_FORMAT]
---reconnect                                                  Enable reconnection [$GOTTY_RECONNECT]
---reconnect-time "10"                                        Time to reconnect [$GOTTY_RECONNECT_TIME]
---timeout "0"                                                Timeout seconds for waiting a client (0 to disable) [$GOTTY_TIMEOUT]
---max-connection "0"                                         Set the maximum number of simultaneous connections (0 to disable)
---once                                                       Accept only one client and exit on disconnection [$GOTTY_ONCE]
---permit-arguments                                           Permit clients to send command line arguments in URL (e.g. http://example.com:8080/?arg=AAA&arg=BBB) [$GOTTY_PERMIT_ARGUMENTS]
---close-signal "1"                                           Signal sent to the command process when gotty close it (default: SIGHUP) [$GOTTY_CLOSE_SIGNAL]
---config "~/.gotty"                                          Config file path [$GOTTY_CONFIG]
---version, -v                                                print the version
-=======
 --address value, -a value     IP address to listen (default: "0.0.0.0") [$GOTTY_ADDRESS]
 --port value, -p value        Port number to listen (default: "8080") [$GOTTY_PORT]
 --permit-write, -w            Permit clients to write to the TTY (BE CAREFUL) [$GOTTY_PERMIT_WRITE]
@@ -107,7 +71,6 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 --close-timeout value         Time in seconds to force kill process after client is disconnected (default: -1) (default: -1) [$GOTTY_CLOSE_TIMEOUT]
 --config value                Config file path (default: "~/.gotty") [$GOTTY_CONFIG]
 --version, -v                 print the version
->>>>>>> 79e1328... Update README.md
 ```
 
 ### Config File
@@ -135,17 +98,9 @@ See the [`.gotty`](https://github.com/sorenisanerd/gotty/blob/master/.gotty) fil
 
 By default, GoTTY doesn't allow clients to send any keystrokes or commands except terminal window resizing. When you want to permit clients to write input to the TTY, add the `-w` option. However, accepting input from remote clients is dangerous for most commands. When you need interaction with the TTY for some reasons, consider starting GoTTY with tmux or GNU Screen and run your command on it (see "Sharing with Multiple Clients" section for detail).
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-To restrict client access, you can use the `-c` option to enable the basic authentication. With this option, clients need to input the specified username and password to connect to the GoTTY server. The `-r` option is a little bit casualer way to restrict access. With this option, GoTTY generates a random URL so that only people who know the URL can get access to the server. Note that the credentical will be transmitted between the server and clients in plain text.
-=======
 To restrict client access, you can use the `-c` option to enable the basic authentication. With this option, clients need to input the specified username and password to connect to the GoTTY server. Note that the credentials will be transmitted between the server and clients in plain text. For more strict authentication, consider the SSL/TLS client certificate authentication described below.
-=======
-To restrict client access, you can use the `-c` option to enable the basic authentication. With this option, clients need to input the specified username and password to connect to the GoTTY server. Note that the credential will be transmitted between the server and clients in plain text. For more strict authentication, consider the SSL/TLS client certificate authentication described below.
->>>>>>> 7e2a6e7... docs: fix typo
 
 The `-r` option is a little bit casualer way to restrict access. With this option, GoTTY generates a random URL so that only people who know the URL can get access to the server.  
->>>>>>> 2397fb0... fixed small error
 
 All traffic between the server and clients are NOT encrypted by default. When you send secret information through GoTTY, we strongly recommend you use the `-t` option which enables TLS/SSL on the session. By default, GoTTY loads the crt and key files placed at `~/.gotty.crt` and `~/.gotty.key`. You can overwrite these file paths with the `--tls-crt` and `--tls-key` options. When you need to generate a self-signed certification file, you can use the `openssl` command.
 
@@ -153,9 +108,9 @@ All traffic between the server and clients are NOT encrypted by default. When yo
 openssl req -x509 -nodes -days 9999 -newkey rsa:2048 -keyout ~/.gotty.key -out ~/.gotty.crt
 ```
 
-For added security you can use an SSL/TLS client certificate by enabling it with the `-C` option (this requires the `-t` or `--tls` flag to be set). This requires all client connecting to provide a valid certificate that can be validated (use the `--client-verify` option to make verification mandatory) against the CA file that is provided via the `--client-ca-file` option.
-
 (NOTE: For Safari uses, see [how to enable self-signed certificates for WebSockets](http://blog.marcon.me/post/24874118286/secure-websockets-safari) when use self-signed certificates)
+
+For additional security, you can use the SSL/TLS client certificate authentication by providing a CA certificate file to the `--tls-ca-crt` option (this option requires the `-t` or `--tls` to be set). This option requires all clients to send valid client certificates that are signed by the specified certification authority.
 
 ## Sharing with Multiple Clients
 
@@ -246,38 +201,3 @@ The MIT License
  * Soren Hansen <sorenisanerd@gmail.com>
 
 ## Contributors
- * 0xflotus <0xflotus@gmail.com>
- * Andrea Lusuardi - uovobw <uovobw@gmail.com>
- * Andy Skelton <skeltoac@gmail.com>
- * Artem Medvedev <amedvedev@outlook.com>
- * Blake Jennings <blake_jennings@me.com>
- * Christian Jensen <christian@jensenbox.com>
- * Christopher Wilkinson <git@wilk.tech>
- * Cyrus <54488650+RealCyGuy@users.noreply.github.com>
- * David Horsley <widdma@gmail.com>
- * Fazal Majid <fazal@majid.org>
- * freakhill <johan.gall@gmail.com>
- * fredster33 <64927044+fredster33@users.noreply.github.com>
- * Iwasaki Yudai <yudai@arielworks.com>
- * Jan-Willem Korver <jwkorver@xs4all.nl>
- * Jason Cooke <Jason-Cooke@users.noreply.github.com>
- * Johan Gall <johan.gall@gmail.com>
- * Korenevskiy Denis <denkoren@corp.badoo.com>
- * Lin <immortalin@icloud.com>
- * Manfred Touron <m@42.am>
- * Massimiliano Stucchi <mstucchi@ripe.net>
- * mattn <mattn.jp@gmail.com>
- * Mikhail f. Shiryaev <mr.felixoid@gmail.com>
- * Quentin Perez <qperez@ocs.online.net>
- * Richard Metzler <r.metzler@cpu-24-7.com>
- * Robert Bittle <guywithnose@gmail.com>
- * Sebastian Haas <sehaas@deebas.com>
- * shingt <van.s.ver@gmail.com>
- * Shoji Ihara <shoji.ihara@gmail.com>
- * Shuanglei Tao <tsl0922@gmail.com>
- * Stephan van Ellewee <stephan.van.ellewee@gmail.com>
- * The Gitter Badger <badger@gitter.im>
- * Xinyun Zhou <me@xyzhou.com>
- * Yifa Zhang <zyfdegh@users.noreply.github.com>
- * yogesh singh <ygit@users.noreply.github.com>
- * zlji <zlji@Ctrip.com>

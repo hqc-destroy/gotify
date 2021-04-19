@@ -13,10 +13,16 @@ GoTTY is a simple command line tool that turns your CLI tools into web applicati
 # Installation
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 Download the latest stable binary file from the [Releases](https://github.com/sorenisanerd/gotty/releases) page. Note that the release marked `Pre-release` is built for testing purpose, which can include unstable or breaking changes. Download a release marked [Latest release](https://github.com/sorenisanerd/gotty/releases/latest) for a stable build.
 =======
 Download the latest stable binary file from the [Releases](https://github.com/yudai/gotty/releases) page. Note that the release marked `Pre-release` is built for testing purpose, which can include unstable or breaking changes. Download a release marked [Latest release](https://github.com/yudai/gotty/releases/latest) for a stable build.
 >>>>>>> 4876619... Fix typo in readme
+=======
+## From release page
+
+You can download the latest stable binary file from the [Releases](https://github.com/sorenisanerd/gotty/releases) page. Note that the release marked `Pre-release` is built for testing purpose, which can include unstable or breaking changes. Download a release marked [Latest release](https://github.com/sorenisanerd/gotty/releases/latest) for a stable build.
+>>>>>>> 8c95f33... Update documentation
 
 (Files named with `darwin_amd64` are for Mac OS X users)
 
@@ -25,7 +31,7 @@ Download the latest stable binary file from the [Releases](https://github.com/yu
 You can install GoTTY with [Homebrew](http://brew.sh/) as well.
 
 ```sh
-$ brew install yudai/gotty/gotty
+$ brew install sorenisanerd/gotty/gotty
 ```
 
 ## `go get` Installation (Development)
@@ -176,8 +182,12 @@ To restrict client access, you can use the `-c` option to enable the basic authe
 To restrict client access, you can use the `-c` option to enable the basic authentication. With this option, clients need to input the specified username and password to connect to the GoTTY server. Note that the credential will be transmitted between the server and clients in plain text. For more strict authentication, consider the SSL/TLS client certificate authentication described below.
 >>>>>>> 7e2a6e7... docs: fix typo
 
+<<<<<<< HEAD
 The `-r` option is a little bit casualer way to restrict access. With this option, GoTTY generates a random URL so that only people who know the URL can get access to the server.  
 >>>>>>> 2397fb0... fixed small error
+=======
+The `-r` option is a little bit more casual way to restrict access. With this option, GoTTY generates a random URL so that only people who know the URL can get access to the server.
+>>>>>>> 0c3bf61... Document new -m option in README
 
 All traffic between the server and clients are NOT encrypted by default. When you send secret information through GoTTY, we strongly recommend you use the `-t` option which enables TLS/SSL on the session. By default, GoTTY loads the crt and key files placed at `~/.gotty.crt` and `~/.gotty.key`. You can overwrite these file paths with the `--tls-crt` and `--tls-key` options. When you need to generate a self-signed certification file, you can use the `openssl` command.
 

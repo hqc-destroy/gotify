@@ -20,9 +20,9 @@ docker:
 >>>>>>> ac0a15d... Update toolchain
 
 .PHONY: asset
-asset: bindata/static/js/gotty.js bindata/static/index.html bindata/static/favicon.png bindata/static/css/index.css bindata/static/css/xterm.css bindata/static/css/xterm_customize.css bindata/static/manifest.json bindata/static/icon_192.png server/asset.go
+asset: bindata/static/js/gotty.js bindata/static/index.html bindata/static/icon.svg bindata/static/favicon.ico bindata/static/css/index.css bindata/static/css/xterm.css bindata/static/css/xterm_customize.css bindata/static/manifest.json bindata/static/icon_192.png server/asset.go
 
-server/asset.go:
+server/asset.go: bindata/* bindata/*/* bindata/*/*/*
 	go-bindata -prefix bindata -pkg server -ignore=\\.gitkeep -o server/asset.go bindata/...
 	gofmt -w server/asset.go
 
@@ -35,14 +35,17 @@ bindata:
 bindata/static: bindata
 	mkdir bindata/static
 
+bindata/static/icon.svg: bindata/static resources/icon.svg
+	cp resources/icon.svg bindata/static/icon.svg
+
 bindata/static/index.html: bindata/static resources/index.html
 	cp resources/index.html bindata/static/index.html
 
 bindata/static/manifest.json: bindata/static resources/manifest.json
 	cp resources/manifest.json bindata/static/manifest.json
 
-bindata/static/favicon.png: bindata/static resources/favicon.png
-	cp resources/favicon.png bindata/static/favicon.png
+bindata/static/favicon.ico: bindata/static resources/favicon.ico
+	cp resources/favicon.ico bindata/static/favicon.ico
 
 bindata/static/icon_192.png: bindata/static resources/icon_192.png
 	cp resources/icon_192.png bindata/static/icon_192.png
@@ -74,14 +77,10 @@ js/node_modules/webpack:
 	cd js && \
 	npm install
 
-README.md: README.md.in
-	git log --pretty=format:' * %aN' | \
-		grep -v 'S.*ren L. Hansen' | \
-		grep -v 'Iwasaki Yudai' | \
-		sort -u > contributors.txt.tmp
+README-options:
 	./gotty --help | sed '1,/GLOBAL OPTIONS/ d' > options.txt.tmp
-	sed -f README.md.sed < $< > $@
-	rm contributors.txt.tmp options.txt.tmp
+	sed -f README.md.sed -i README.md
+	rm options.txt.tmp
 
 tools:
 	go get github.com/mitchellh/gox

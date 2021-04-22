@@ -1,4 +1,4 @@
-# ![](https://raw.githubusercontent.com/sorenisanerd/gotty/master/resources/favicon.png) GoTTY - Share your terminal as a web application
+# ![](https://raw.githubusercontent.com/sorenisanerd/gotty/master/resources/favicon.ico) GoTTY - Share your terminal as a web application
 
 [![GitHub release](http://img.shields.io/github/release/sorenisanerd/gotty.svg?style=flat-square)][release]
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)][license]
@@ -53,6 +53,7 @@ Run `gotty` with your preferred command as its arguments (e.g. `gotty top`).
 By default, GoTTY starts a web server at port 8080. Open the URL on your web browser and you can see the running command as if it were running on your terminal.
 
 ## Options
+<<<<<<< HEAD
 
 ```
 <<<<<<< HEAD
@@ -117,6 +118,9 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
 --version, -v                 print the version
 >>>>>>> 79e1328... Update README.md
 =======
+=======
+```sh
+>>>>>>> b8e97d7... Fix options help in README.md in-place
    --address value, -a value     IP address to listen (default: "0.0.0.0") [$GOTTY_ADDRESS]
    --port value, -p value        Port number to liten (default: "8080") [$GOTTY_PORT]
    --path value, -m value        Base path (default: "/") [$GOTTY_PATH]
@@ -139,7 +143,8 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
    --width value                 Static width of the screen, 0(default) means dynamically resize (default: 0) [$GOTTY_WIDTH]
    --height value                Static height of the screen, 0(default) means dynamically resize (default: 0) [$GOTTY_HEIGHT]
    --ws-origin value             A regular expression that matches origin URLs to be accepted by WebSocket. No cross origin requests are acceptable by default [$GOTTY_WS_ORIGIN]
-   --term value                  Terminal name to use on the browser, one of xterm or hterm. (default: "hterm") [$GOTTY_TERM]
+   --term value                  Terminal name to use on the browser, one of xterm or hterm. (default: "xterm") [$GOTTY_TERM]
+   --enable-webgl                Enable WebGL renderer (default: false) [$GOTTY_ENABLE_WEBGL]
    --close-signal value          Signal sent to the command process when gotty close it (default: SIGHUP) (default: 1) [$GOTTY_CLOSE_SIGNAL]
    --close-timeout value         Time in seconds to force kill process after client is disconnected (default: -1) (default: -1) [$GOTTY_CLOSE_TIMEOUT]
    --config value                Config file path (default: "~/.gotty") [$GOTTY_CONFIG]
@@ -147,9 +152,7 @@ By default, GoTTY starts a web server at port 8080. Open the URL on your web bro
    --version, -v                 print the version (default: false)
 >>>>>>> f01cf51... Automate options documentation
 ```
-
 ### Config File
-
 You can customize default options and your terminal (hterm) by providing a config file to the `gotty` command. GoTTY loads a profile file at `~/.gotty` by default when it exists.
 
 ```
@@ -278,49 +281,3 @@ GoTTY uses [xterm.js](https://xtermjs.org/) and [hterm](https://groups.google.co
 The MIT License
 
 # Contributors
-
-## Original author
-
- * Iwasaki Yudai
-
-## Maintainer
-
- * Søren L. Hansen
-
-## Contributors
-
- * 0xflotus
- * Anand Patil
- * Andrea Lusuardi - uovobw
- * Andy Skelton
- * Artem Medvedev
- * Blake Jennings
- * Christian Jensen
- * Christopher Wilkinson
- * Cyrus
- * David Horsley
- * Fazal Majid
- * freakhill
- * fredster33
- * Jan-Willem Korver
- * Jason Cooke
- * Johan Gall
- * Korenevskiy Denis
- * Lin
- * Manfred Touron
- * Massimiliano Stucchi
- * mattn
- * Mikhail f. Shiryaev
- * Quentin Perez
- * Richard Metzler
- * Robert Bittle
- * Sebastian Haas
- * shingt
- * Shoji Ihara
- * Shuanglei Tao
- * Stephan van Ellewee
- * The Gitter Badger
- * Xinyun Zhou
- * Yifa Zhang
- * yogesh singh
- * zlji

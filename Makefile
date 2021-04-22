@@ -1,7 +1,7 @@
 OUTPUT_DIR = ./builds
 GIT_COMMIT = `git rev-parse HEAD | cut -c1-7`
-VERSION = 1.1.0
-BUILD_OPTIONS = -ldflags "-X main.Version=$(VERSION) -X main.CommitID=$(GIT_COMMIT)"
+VERSION = $(shell git describe --tags)
+BUILD_OPTIONS = -ldflags "-X main.Version=$(VERSION)"
 
 <<<<<<< HEAD
 gotty: main.go server/*.go webtty/*.go backend/*.go Makefile
@@ -59,8 +59,8 @@ bindata/static/css/index.css: bindata/static/css resources/index.css
 bindata/static/css/xterm_customize.css: bindata/static/css resources/xterm_customize.css
 	cp resources/xterm_customize.css bindata/static/css/xterm_customize.css
 
-bindata/static/css/xterm.css: bindata/static/css js/node_modules/xterm/dist/xterm.css
-	cp js/node_modules/xterm/dist/xterm.css bindata/static/css/xterm.css
+bindata/static/css/xterm.css: bindata/static/css js/node_modules/xterm/css/xterm.css
+	cp js/node_modules/xterm/css/xterm.css bindata/static/css/xterm.css
 
 js/node_modules/xterm/dist/xterm.css:
 	cd js && \

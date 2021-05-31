@@ -130,6 +130,7 @@ func main() {
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 		if c.IsSet("credential") {
 			options.EnableBasicAuth = true
 =======
@@ -139,6 +140,14 @@ func main() {
 		appOptions.EnableBasicAuth = c.IsSet("credential")
 		appOptions.EnableTLSClientAuth = c.IsSet("tls-ca-crt")
 >>>>>>> 496ef86... refactor: decouple gotty app with terminal backends
+=======
+		if c.IsSet("credential") {
+			appOptions.EnableBasicAuth = true
+		}
+		if c.IsSet("tls-ca-crt") {
+			appOptions.EnableTLSClientAuth = true
+		}
+>>>>>>> fa09e03... Fix auth modes enabled by config file
 
 		err = appOptions.Validate()
 		if err != nil {

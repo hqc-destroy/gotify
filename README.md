@@ -1,6 +1,18 @@
 # ![](https://raw.githubusercontent.com/sorenisanerd/gotty/master/resources/favicon.ico) GoTTY - Share your terminal as a web application
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors-)
+<<<<<<< HEAD
+<<<<<<< HEAD
+<<<<<<< HEAD
+[![All Contributors](https://img.shields.io/badge/all_contributors-34-orange.svg?style=flat-square)](#contributors-)
+=======
+[![All Contributors](https://img.shields.io/badge/all_contributors-33-orange.svg?style=flat-square)](#contributors)
+>>>>>>> a235654... Fix typo in README.md contributors link
+=======
+[![All Contributors](https://img.shields.io/badge/all_contributors-35-orange.svg?style=flat-square)](#contributors-)
+>>>>>>> 84187ce...  Add @prusnak as a contributor
+=======
+[![All Contributors](https://img.shields.io/badge/all_contributors-36-orange.svg?style=flat-square)](#contributors-)
+>>>>>>> d51cec2...  Add @devanlai as a contributor
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![GitHub release](http://img.shields.io/github/release/sorenisanerd/gotty.svg?style=flat-square)][release]
@@ -333,6 +345,11 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://mattn.kaoriya.net/"><img src="https://avatars.githubusercontent.com/u/10111?v=4?s=100" width="100px;" alt=""/><br /><sub><b>mattn</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/commits?author=mattn" title="Code">💻</a></td>
     <td align="center"><a href="https://www.shingt.com/"><img src="https://avatars.githubusercontent.com/u/1391330?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Shinichi Goto</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/commits?author=shingt" title="Code">💻</a></td>
     <td align="center"><a href="https://twitter.com/_yogeshsingh"><img src="https://avatars.githubusercontent.com/u/8512357?v=4?s=100" width="100px;" alt=""/><br /><sub><b>ygit</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/commits?author=ygit" title="Code">💻</a></td>
+    <td align="center"><a href="http://forum.cachem.fr/viewforum.php?f=21"><img src="https://avatars.githubusercontent.com/u/3392684?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stéphane</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/issues?q=author%3Anephaste" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://rusnak.io/"><img src="https://avatars.githubusercontent.com/u/42201?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pavol Rusnak</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/commits?author=prusnak" title="Code">💻</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/devanlai"><img src="https://avatars.githubusercontent.com/u/1348448?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Devan Lai</b></sub></a><br /><a href="https://github.com/sorenisanerd/gotty/commits?author=devanlai" title="Code">💻</a></td>
   </tr>
 </table>
 
